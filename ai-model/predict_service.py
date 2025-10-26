@@ -93,10 +93,15 @@ def predict():
         
         return jsonify(response), 200
         
+    except ValueError as e:
+        logger.error(f"Invalid input data: {e}")
+        return jsonify({
+            'error': 'Invalid input data format'
+        }), 400
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
         return jsonify({
-            'error': str(e)
+            'error': 'Prediction failed. Please check your input and try again.'
         }), 500
 
 
