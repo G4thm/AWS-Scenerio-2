@@ -1,0 +1,251 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "smv-cloud-insight",
+    "title": "SMV Cloud Insight Dashboard",
+    "tags": ["smv", "monitoring", "ai", "etl"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "EC2 CPU Utilization",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/EC2",
+            "metricName": "CPUUtilization",
+            "dimensions": {
+              "InstanceId": "$instance_id"
+            },
+            "statistics": ["Average"],
+            "period": "300"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "CPU %",
+            "format": "percent",
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "SMV/Monitoring",
+            "metricName": "MEM_USED",
+            "dimensions": {},
+            "statistics": ["Average"],
+            "period": "300"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Memory %",
+            "format": "percent",
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Network Traffic",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "AWS/EC2",
+            "metricName": "NetworkIn",
+            "dimensions": {
+              "InstanceId": "$instance_id"
+            },
+            "statistics": ["Sum"],
+            "period": "300"
+          },
+          {
+            "refId": "B",
+            "namespace": "AWS/EC2",
+            "metricName": "NetworkOut",
+            "dimensions": {
+              "InstanceId": "$instance_id"
+            },
+            "statistics": ["Sum"],
+            "period": "300"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Bytes",
+            "format": "bytes"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "ETL Pipeline Status",
+        "type": "stat",
+        "gridPos": {
+          "x": 12,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "SMV/ETL",
+            "metricName": "PipelineExecutions",
+            "dimensions": {},
+            "statistics": ["Sum"],
+            "period": "3600"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "AI Model Predictions",
+        "type": "stat",
+        "gridPos": {
+          "x": 18,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "SMV/AI",
+            "metricName": "PredictionCount",
+            "dimensions": {},
+            "statistics": ["Sum"],
+            "period": "3600"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Model Accuracy",
+        "type": "gauge",
+        "gridPos": {
+          "x": 12,
+          "y": 12,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "SMV/AI",
+            "metricName": "ModelAccuracy",
+            "dimensions": {},
+            "statistics": ["Average"],
+            "period": "3600"
+          }
+        ],
+        "options": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 70,
+                "color": "yellow"
+              },
+              {
+                "value": 90,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Disk Usage",
+        "type": "gauge",
+        "gridPos": {
+          "x": 18,
+          "y": 12,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "refId": "A",
+            "namespace": "SMV/Monitoring",
+            "metricName": "DISK_USED",
+            "dimensions": {},
+            "statistics": ["Average"],
+            "period": "300"
+          }
+        ],
+        "options": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 70,
+                "color": "yellow"
+              },
+              {
+                "value": 90,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "instance_id",
+          "type": "query",
+          "query": "ec2_instance_attribute(InstanceId, {\"tag:Name\": [\"smv_data-ai-node\"]})",
+          "current": {},
+          "options": [],
+          "refresh": 1
+        }
+      ]
+    }
+  }
+}

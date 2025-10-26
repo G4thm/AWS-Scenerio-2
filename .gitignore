@@ -102,6 +102,8 @@ data/
 *.parquet
 !*example*.csv
 !*example*.json
+!monitoring/*.json
+!infrastructure/*.json
 
 # Logs
 logs/
