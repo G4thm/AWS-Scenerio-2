@@ -1,0 +1,20 @@
+# AWS region
+aws_region = "us-east-1"
+
+# Project name
+project_name = "smv"
+
+# EC2 instance type
+instance_type = "t3.large"
+
+# SSH key pair name (must be created in AWS first)
+key_name = "your-key-name"
+
+# Allowed SSH access CIDR blocks
+allowed_ssh_cidr = ["0.0.0.0/0"]
+
+# Allowed HTTP access CIDR blocks
+allowed_http_cidr = ["0.0.0.0/0"]
+
+# Database password (use a secure password)
+db_password = "your-secure-password"

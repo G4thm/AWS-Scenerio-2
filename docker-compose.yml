@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: smv_postgres
+    environment:
+      POSTGRES_DB: smv_database
+      POSTGRES_USER: smv_user
+      POSTGRES_PASSWORD: smv_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smv_user -d smv_database"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smv_network
+
+  # ETL Pipeline Container
+  etl_pipeline:
+    build:
+      context: ./etl-pipeline
+      dockerfile: Dockerfile
+    container_name: smv_etl-pipeline
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-smv-data-bucket}
+      S3_DATA_PREFIX: ${S3_DATA_PREFIX:-raw-data/}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: smv_database
+      POSTGRES_USER: smv_user
+      POSTGRES_PASSWORD: smv_password
+      BATCH_SIZE: 1000
+      LOG_LEVEL: INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smv_network
+    restart: on-failure
+
+  # AI Model Training (run once)
+  ai_model_train:
+    build:
+      context: ./ai-model
+      dockerfile: Dockerfile
+    container_name: smv_model_trainer
+    command: python train_model.py
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: smv_database
+      POSTGRES_USER: smv_user
+      POSTGRES_PASSWORD: smv_password
+      MODEL_PATH: /app/models/smv_predictor_v1.pkl
+      MODEL_VERSION: v1
+      TEST_SIZE: 0.2
+      RANDOM_STATE: 42
+      LOG_LEVEL: INFO
+    volumes:
+      - model_data:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smv_network
+    profiles:
+      - training
+
+  # AI Model Prediction Service
+  ai_model_service:
+    build:
+      context: ./ai-model
+      dockerfile: Dockerfile
+    container_name: smv_predictor_v1
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: smv_database
+      POSTGRES_USER: smv_user
+      POSTGRES_PASSWORD: smv_password
+      MODEL_PATH: /app/models/smv_predictor_v1.pkl
+      MODEL_VERSION: v1
+      SERVICE_PORT: 8000
+      LOG_LEVEL: INFO
+    ports:
+      - "8000:8000"
+    volumes:
+      - model_data:/app/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smv_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana Monitoring Dashboard
+  grafana:
+    build:
+      context: ./monitoring
+      dockerfile: Dockerfile
+    container_name: smv_cloud-insight
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - smv_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  model_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  smv_network:
+    driver: bridge
