@@ -1,0 +1,6 @@
+OrderID,Customer,Product,Quantity,Price,Date
+1010,Charlie,Keyboard,1,45,06-10-2025
+1011,Dave,Monitor,2,200,06-10-2025
+1012,Eve,Headset,3,50,07-10-2025
+1013,Alice,Mouse,1,25,07-10-2025
+1014,Bob,Laptop,1,1200,08-10-2025

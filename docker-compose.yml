@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  etl:
+    build: ./etl
+    container_name: smv_etl_service
+    volumes:
+      - ./etl:/app
+    command: ["python", "etl.py"]
+  
+  data_proc_1:
+    build: ./data_proc_1
+    container_name: smv_data_proc_1
+    volumes:
+      - ./data_proc_1:/app
+    command: ["python", "data_proc.py"]
+
+  data_proc_2:
+    build: ./data_proc_2
+    container_name: smv_data_proc_2
+    volumes:
+      - ./data_proc_2:/app
+    command: ["python", "data_proc.py"]
+
+  model_service:
+    build: ./model_service
+    container_name: smv_model_service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./model_service:/app
+    command: ["python", "serve.py"]
+
