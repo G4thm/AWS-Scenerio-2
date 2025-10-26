@@ -11,9 +11,13 @@ instance_type = "t3.large"
 key_name = "your-key-name"
 
 # Allowed SSH access CIDR blocks
+# WARNING: 0.0.0.0/0 allows access from anywhere - NOT RECOMMENDED for production
+# For production, restrict to your IP or trusted networks, e.g., ["1.2.3.4/32"]
 allowed_ssh_cidr = ["0.0.0.0/0"]
 
-# Allowed HTTP access CIDR blocks
+# Allowed HTTP access CIDR blocks (API and Grafana)
+# WARNING: 0.0.0.0/0 allows access from anywhere - NOT RECOMMENDED for production
+# For production, restrict to trusted networks, e.g., ["10.0.0.0/8", "172.16.0.0/12"]
 allowed_http_cidr = ["0.0.0.0/0"]
 
 # Database password (use a secure password)

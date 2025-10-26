@@ -159,6 +159,13 @@ When deployed on AWS:
 - AI Model API: http://<ec2-public-ip>:8000
 - Grafana Dashboard: http://<ec2-public-ip>:3000
 
+**⚠️ Security Note**: For production deployments:
+- Configure `allowed_http_cidr` in `terraform.tfvars` to restrict access to trusted IP ranges
+- Implement HTTPS with SSL/TLS certificates
+- Enable authentication for API endpoints (API keys, OAuth2)
+- Use AWS WAF for additional protection
+- Consider using Application Load Balancer with ACM certificates
+
 ## Next Steps for Deployment
 
 1. Configure AWS credentials

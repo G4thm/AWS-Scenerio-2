@@ -22,13 +22,13 @@ variable "key_name" {
 }
 
 variable "allowed_ssh_cidr" {
-  description = "CIDR blocks allowed to SSH"
+  description = "CIDR blocks allowed to SSH. WARNING: 0.0.0.0/0 is not recommended for production. Restrict to your IP or trusted networks."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
 
 variable "allowed_http_cidr" {
-  description = "CIDR blocks allowed HTTP access"
+  description = "CIDR blocks allowed HTTP access to API and Dashboard. WARNING: 0.0.0.0/0 is not recommended for production. Restrict to trusted networks."
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }

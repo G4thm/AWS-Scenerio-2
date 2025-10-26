@@ -273,10 +273,17 @@ Default credentials: admin/admin
 
 1. Change default passwords in production
 2. Use AWS Secrets Manager for sensitive data
-3. Restrict security group CIDR blocks
+3. Restrict security group CIDR blocks to trusted IP ranges only
 4. Enable S3 bucket encryption
 5. Regularly update dependencies
 6. Monitor CloudWatch logs
+7. **Production Security**:
+   - Configure `allowed_http_cidr` and `allowed_ssh_cidr` in `terraform.tfvars` to restrict access
+   - Implement HTTPS with SSL/TLS certificates (use AWS Certificate Manager)
+   - Enable API authentication (API keys, OAuth2, JWT)
+   - Use AWS WAF for web application firewall protection
+   - Consider Application Load Balancer for SSL termination
+   - Never expose services on 0.0.0.0/0 in production
 
 ## Monitoring and Logging
 
